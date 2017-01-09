@@ -11,7 +11,8 @@ NEW_RELIC_API_KEY = str(os.environ['NEW_RELIC_API_KEY'])
 app = Applications(api_key=NEW_RELIC_API_KEY)
 
 # Define LOCAL_PATH
-LOCAL_PATH = 'T:\\Warehouse Data Files\\New Relic\\'
+LOCAL_PATH = 'C:\\Users\\alexi\\OneDrive\\Documents\\GitHub\\Python\\NewRelic\\'
+# LOCAL_PATH = 'T:\\\\Warehouse Data Files\\\\New Relic\\\\'
 
 # Define appListFileName
 appListFileName = LOCAL_PATH+'applicationList.csv'
@@ -123,8 +124,8 @@ def getApplicationList():
 	# Write data frame to CSV
 	with open(appListFileName, 'w') as f:
 		appsDF.to_csv(f, sep=',', encoding='utf-8', index=False)
-		f.close()
-
+		f.close()		
+		
 def getAppMetricsData():
 	# Read appListFileName into pandas dataframe (appsDF)
 	appsDF = pandas.DataFrame.from_csv(appListFileName, header=0, index_col=None)
@@ -161,15 +162,35 @@ def getAppMetricsData():
 
 	# appMetricsDFErrors = pandas.DataFrame(index=range(str(len(sundays))*str(len(appsDF.index))), columns=appMetricsColumnNames)
 
+	# retryer
+	@retry(Exception, tries=4)
+	def getResponse(var1,var2,var3,var4,var5):
+		try:
+			response = app.metric_data(id=var1, names=var2, values=var3, from_dt=var4, to_dt=var5, summarize=True)
+		except:
+			raise Exception("Fail")
+		return response
+		# response = app.metric_data(id=var1, names=var2, values=var3, from_dt=var4, to_dt=var5, summarize=True)
+		# x += var3
+		# if x < 6:
+			# raise Exception("Fail")
+		# else:
+			 # return x	
+	
 	for appID in appsDF['id']:
 		print 'Getting metrics data for ' + appsDF.loc[appsDF['id'] == appID, 'name'].iloc[0] + ' (app ' + str(appsDF[appsDF['id']==appID].index.tolist()[0]+1) + ' of ' + str(len(appsDF.index)) + ')'
 		for i in range(len(dateRangeDF)):
 			startDate = datetime.datetime.combine(dateRangeDF['StartDate'][i], datetime.time(0, 0, 0))
 			endDate = datetime.datetime.combine(dateRangeDF['EndDate'][i], datetime.time(23, 59, 59))
 			try:
-				response = app.metric_data(id=appID, names=metricNames, values=metricValues, from_dt=startDate, to_dt=endDate, summarize=True)
+				response = getResponse(appID,metricNames,metricValues,startDate,endDate)
+				# response = app.metric_data(id=appID, names=metricNames, values=metricValues, from_dt=startDate, to_dt=endDate, summarize=True)
 			except:
 				# Need to add a dataFrame here to collect list of failures, would want to rerun at end of or something
+				print "Failure: " + "\n"
+				print "AppID: " + str(appID) + "\n"
+				print "StartDate: " + str(startDate) + "\n"
+				print "EndDate: " + str(endDate) + "\n"
 				continue
 			appMetricsDFTemp = pandas.DataFrame(index=range(1), columns=appMetricsColumnNames)
 			appMetricsDFTemp['id'][0] = appID
