@@ -11,8 +11,8 @@ NEW_RELIC_API_KEY = str(os.environ['NEW_RELIC_API_KEY'])
 app = Applications(api_key=NEW_RELIC_API_KEY)
 
 # Define LOCAL_PATH
-LOCAL_PATH = 'C:\\Users\\alexi\\OneDrive\\Documents\\GitHub\\Python\\NewRelic\\'
-# LOCAL_PATH = 'T:\\\\Warehouse Data Files\\\\New Relic\\\\'
+# LOCAL_PATH = 'C:\\Users\\alexi\\OneDrive\\Documents\\GitHub\\Python\\NewRelic\\'
+LOCAL_PATH = 'T:\\Warehouse Data Files\\New Relic\\'
 
 # Define appListFileName
 appListFileName = LOCAL_PATH+'applicationList.csv'
@@ -136,11 +136,11 @@ def getAppMetricsData():
 
 	dateRangeDF = pandas.DataFrame(columns=['StartDate', 'EndDate'])
 	SUN = 6
-	# startDate = '2016-09-04'
-	# start_date = datetime.datetime.strptime(startDate, '%Y-%m-%d').date()
+	startDate = '2016-09-04'
+	start_date = datetime.datetime.strptime(startDate, '%Y-%m-%d').date()
 	end_date = date.today()
-	start_date = end_date - timedelta(days=7)
-	startDate = start_date.strftime('%Y-%m-%d')
+	# start_date = end_date - timedelta(days=7)
+	# startDate = start_date.strftime('%Y-%m-%d')
 	print 'Getting number of Sundays between ' + str(start_date) + ' and ' + str(end_date)    # debug
 
 	days = [date.fromordinal(d) for d in  
